@@ -1,0 +1,290 @@
+/*
+    Document   : HoFinControl
+    Created on : 11-sep-2020, 21:47:52
+    Author     : Administrador
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/*
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+body {
+    font-size: 14px;
+}
+.jaula {
+    position: relative;
+    top: 0;
+    height: 100vh;
+}
+
+.panelPrincipal{
+    background-color: #EEEEEE;
+    position: relative;
+    float: right;
+    overflow: auto;
+    width: 80%;
+    min-height: 100%;
+    color: #FFFFFF;
+}
+
+.panelPrincipal a{
+    color: #FFFFFF !important;
+}
+
+.menu {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: 260px;
+    background: #FFFFFF;
+}
+
+.logo{
+    padding: 13px 15px;
+}
+
+.usuarioLink{
+    color: #FFFFFF;
+    padding-right: 40px;
+}
+
+.salirLink{
+    color: #FFFFFF;
+    padding-right: 5px;
+}
+
+.avatarDashboard {
+    position: absolute;    
+    
+    top: 5px;
+    width: 20px;    
+}
+
+.avatarClose {
+    position: absolute;
+    right: 0px;
+    top: 5px;
+    width: 20px;
+}
+
+.row{
+    margin-bottom: 20px;
+}
+
+.fa-user{
+    color: #FFFFFF !important;
+    padding: 15px 15px 15px 0px;
+}
+
+.fa-bar-chart{
+    color: orange;
+    padding-right: 30px;
+    font-size: 30px;
+}
+
+.fa-arrow-down{
+    color: red;
+    padding-right: 30px;
+    font-size: 30px;
+}
+
+.fa-arrow-up{
+    color: teal;
+    padding-right: 30px;
+    font-size: 30px;
+}
+
+.fa-sign-out{
+    color: #FFFFFF !important;
+    font-size: 15px
+}
+
+.fa-line-chart, .fa-pie-chart{
+    padding-right: 40px;
+}
+
+.fa-eur{
+    color: #000000;
+}
+
+.close{
+    padding: 15px 15px 15px 0px;
+}
+
+.fa-times, .close:hover{
+    cursor: pointer;
+}
+
+.fa-times, .read{
+    color: #DF0101;
+}
+
+.fa-pencil {
+    cursor: pointer;
+}
+
+.marginMenu {
+    margin-top: 10px;
+}
+
+.marginMenu a span {
+    padding-right: 10px;
+}
+
+.card-margin {
+    margin-top: 20px;
+    color: #000000;
+    font-weight: bold;
+}
+
+.card-margin .card-header {
+    float: left;
+    text-align: center;
+}
+
+.card-header p{
+    color: gray !important;
+}
+
+.card-margin .card-content {
+    text-align: right;
+    padding-top: 10px;
+}
+
+.card .card-content {
+    padding: 15px 20px;
+    position: relative;
+    font-size: 20px;
+}
+
+tbody > tr > td, thead > tr > td {   
+    vertical-align: middle !important;
+    font-size: 13px;
+}
+
+.ver{
+    cursor: pointer;
+
+}
+.ver:hover{
+    background-color: #D8D8D8;
+}
+
+.error {
+    color: #FF0000;
+}
+
+/* Estilos formularios de mantenimiento */
+
+.form-row {
+    margin: 5px;
+}
+
+/*Estilos paginación*/
+.page-link {
+    cursor: pointer;
+}
+
+
+/*ESTILOS DE LA PANTALLA DE LOGIN*/
+.form-control {
+    min-height: 35px;
+    font-size: 13px;
+    background: #fff;
+    box-shadow: none !important;
+    border-color: #e3e3e3;
+}
+.form-control:focus {
+    border-color: #70c5c0;
+}
+.form-control, .btn {
+    border-radius: 2px;
+}
+.login{
+    width: 350px;
+    margin: 0 auto;
+    padding: 100px 0 30px;
+}
+.login-form form {
+    color: #7a7a7a;
+    border-radius: 2px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    background: #ececec;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    position: relative;
+}
+.login-form h2 {
+    font-size: 22px;
+    margin: 35px 0 25px;
+}
+.login-form .avatar {
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    top: -50px;
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    z-index: 9;
+    background: #007bff;
+    padding: 15px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+}
+.login-form .avatar img {
+    width: 100%;
+}
+.login-form input[type="checkbox"] {
+    position: relative;
+    top: 1px;
+}
+.login-form .btn, .login-form .btn:active {
+    font-size: 16px;
+    font-weight: bold;
+    
+    border: none;
+    margin-bottom: 20px;
+}
+/*.login-form .btn:hover, .login-form .btn:focus {
+    background: #50b8b3 !important;
+}*/
+.login-form a {
+    color: #007bff;
+    text-decoration: underline;
+}
+.login-form a:hover {
+    text-decoration: none;
+}
+.login-form form a {
+    color: #7a7a7a;
+    text-decoration: none;
+}
+.login-form form a:hover {
+    text-decoration: underline;
+}
+.login-form .bottom-action {
+    font-size: 14px;
+}
+
+.fade.in {
+    opacity: 1;
+}
+
+.modal.in .modal-dialog {
+  -webkit-transform: translate(0, 0);
+       -o-transform: translate(0, 0);
+          transform: translate(0, 0);
+}
+
+.modal-backdrop.in {
+    filter: alpha(opacity=50);
+    opacity: .5;
+}
+

@@ -59,21 +59,21 @@
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-8">
-                                        <label class ="cabeceraLabel" for="mail"><u>E</u>-Mail:</label>
-                                        <input type="text" class="form-control" id="mail" placeholder="E-Mail" ng-model="profileView.mail" accesskey="D" tabindex="8" maxlength="50" />
+                                        <label class ="cabeceraLabel" for="mail"><u>E</u>-Mail (Obligatorio):</label>
+                                        <input type="text" class="form-control" id="mail" placeholder="E-Mail" ng-model="profileView.mail" accesskey="D" tabindex="8" maxlength="50" required/>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
-                                        <label class ="cabeceraLabel" for="usuario"><u>U</u>suario:</label>
+                                        <label class ="cabeceraLabel" for="usuario"><u>U</u>suario (Obligatorio):</label>
                                         <input type="text" class="form-control" id="usuario" ng-model="profileView.usuario" placeholder="Usuario" accesskey="U" tabindex="9" maxlength="20" required/>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label class ="cabeceraLabel" for="contrasena"><u>C</u>ontraseña:</label>
+                                        <label class ="cabeceraLabel" for="contrasena"><u>C</u>ontraseña (Obligatorio):</label>
                                         <input type="password" class="form-control" id="contrasena" ng-model="profileView.contrasena" placeholder="Contraseña" accesskey="C" tabindex="9" maxlength="10" required/>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label class ="cabeceraLabel" for="contrasena2"><u>C</u>onfirmar contraseña:</label>
+                                        <label class ="cabeceraLabel" for="contrasena2"><u>C</u>onfirmar contraseña (Obligatorio):</label>
                                         <input type="password" class="form-control" id="contrasena2" ng-model="profileView.contrasena2" placeholder="Confirmar contraseña" accesskey="O" tabindex="10" maxlength="10" required />
                                     </div>
                                 </div>

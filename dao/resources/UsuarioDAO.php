@@ -21,10 +21,16 @@ class UsuarioDAO {
         $conexion = DB::getConnection();
         $usuario = null;
         try {
+            $consulta = "SELECT * FROM usuarios WHERE user = :usuario ";
+            if(isset($contrasena)){
+                $consulta = $consulta . "AND password = md5(:contrasena)";
+            }
             // Consulta preparada
-            $sql = $conexion->prepare("SELECT * FROM usuarios WHERE user = :usuario AND password = md5(:contrasena)");
+            $sql = $conexion->prepare($consulta);
             $sql->bindParam(':usuario', $nombre, PDO::PARAM_STR);
-            $sql->bindParam(':contrasena', $contrasena, PDO::PARAM_STR);
+            if(isset($contrasena)){
+                $sql->bindParam(':contrasena', $contrasena, PDO::PARAM_STR);
+            }
 
             if($sql->execute()) {
                 while ($row = $sql->fetch()) {

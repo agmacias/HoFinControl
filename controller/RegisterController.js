@@ -34,7 +34,7 @@ app.controller('RegisterController', ['$scope','$http','$uibModal', function($sc
                     apellido1: $scope.profileView.apellido1,
                     apellido2: $scope.profileView.apellido2,
                     nacimiento: $scope.profileView.nacimiento,
-                    pais: $scope.profileView.pais,
+                    pais: $scope.profileView.pais=="0"?null:$scope.profileView.pais,
                     telefono: $scope.profileView.telefono,
                     direccion: $scope.profileView.direccion,
                     email: $scope.profileView.mail,
@@ -57,6 +57,8 @@ app.controller('RegisterController', ['$scope','$http','$uibModal', function($sc
                         $scope.abrirVentanaModalKo(respuesta.data.mensaje);
                     }
                 });
+            }else{
+                 $scope.abrirVentanaModalKo("Las contraseñas no coinciden.");
             }
         };
 

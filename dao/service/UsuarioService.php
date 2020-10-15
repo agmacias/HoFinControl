@@ -52,16 +52,31 @@ if($opcion==1){
     if(isset($datos->pais)){
         $pais = $datos->pais;
     }
-    $telefono = $datos->telefono;
-    $direccion = $datos->direccion;
-    $email = $datos->email;
+    $telefono = null;
+    if(isset($datos->telefono)){
+        $telefono = $datos->telefono;
+    }
+    $direccion = null;
+    if(isset($datos->direccion)){
+        $direccion = $datos->direccion;
+    }
+    $email = null;
+    if(isset($datos->email)){
+        $email = $datos->email;
+    }
 
-    $result = UsuarioDAO::insertUsuario($usuario, $password, $nombre, $apellido1, $apellido2, $f_nacimiento, $pais, $telefono, $direccion, $email);
+    $usuarioAlta = UsuarioDAO::getUsuarioExplicito($usuario, null);
 
-    if($result==true){
-        $response = array('response' => true, 'mensaje' => 'Usuario dado de alta correctamente.');
+    if($usuarioAlta==null){
+        $result = UsuarioDAO::insertUsuario($usuario, $password, $nombre, $apellido1, $apellido2, $f_nacimiento, $pais, $telefono, $direccion, $email);
+
+        if($result==true){
+            $response = array('response' => true, 'mensaje' => 'Usuario dado de alta correctamente.');
+        }else{
+            $response = array('response' => false, 'mensaje' => 'Se ha producido un error en el guardado de datos.');
+        }
     }else{
-        $response = array('response' => false, 'mensaje' => 'Se ha producido un error en el guardado de datos.');
+        $response = array('response' => false, 'mensaje' => 'El usuario que intenta dar de alta ya existe en base de datos.');
     }
     
 }else if($opcion==3){

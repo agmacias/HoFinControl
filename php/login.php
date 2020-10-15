@@ -29,7 +29,7 @@
                 </div>
                 <div class="bottom-action clearfix">
                     <label class="float-left form-check-label"><input type="checkbox">Recuérdame</label>
-                    <a href="#" class="float-right">¿Olvidaste la contraseña?</a>
+                    <!--<a href="#" class="float-right">¿Olvidaste la contraseña?</a>-->
                 </div>
             </form>
             <p class="text-center small">No tengo una cuenta <a href="register.php">Registrarse</a></p>

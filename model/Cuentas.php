@@ -6,36 +6,24 @@
  */
 class Cuentas {
     private $id;
-    private $nombre;
-    private $tipo_cuenta_id;
-    private $tipo_cuenta;
+    private $nombre;     
     private $usuario;
     private $fecha;
     private $cuantia;
     private $defecto;
     private $fechaFin;
 
-    public function __construct($id ,$nombre, $tipo_cuenta, $usuario, $fecha,
-            $cuantia, $defecto, $fechaFin, $tipo_cuenta_id) {
+    public function __construct($id ,$nombre, $usuario, $fecha,
+            $cuantia, $defecto, $fechaFin) {
         $this->id = $id;
-        $this->nombre = $nombre;
-        $this->tipo_cuenta=$tipo_cuenta;
+        $this->nombre = $nombre;        
         $this->usuario = $usuario;
         $this->fecha = $fecha;
         $this->cuantia = $cuantia;
         $this->defecto = $defecto;
-        $this->fechaFin = $fechaFin;
-        $this->tipo_cuenta_id = $tipo_cuenta_id;
+        $this->fechaFin = $fechaFin;        
     }
-
-    public function getTipo_cuenta_id() {
-        return $this->tipo_cuenta_id;
-    }
-
-    public function setTipo_cuenta_id($tipo_cuenta_id) {
-        $this->tipo_cuenta_id = $tipo_cuenta_id;
-    }
-
+    
     public function getFechaFin() {
         return $this->fechaFin;
     }
@@ -58,15 +46,7 @@ class Cuentas {
 
     public function setNombre($nombre) {
         $this->nombre = $nombre;
-    }
-
-    public function getTipo_cuenta() {
-        return $this->tipo_cuenta;
-    }
-
-    public function setTipo_cuenta($tipo_cuenta) {
-        $this->tipo_cuenta = $tipo_cuenta;
-    }
+    }   
 
     public function getUsuario() {
         return $this->usuario;

@@ -22,7 +22,8 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
 
             // limpiamos el formulario;
             $scope.mantGastosView={
-                tipoIngreso:"0",
+                tipoIngreso:"",
+                cuenta:"",
                 pantalla:1
             };
 
@@ -84,10 +85,12 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
               });
         };
 
+        // buscamos los ingresos en función de los parámetros introducidos en pantalla
         $scope.searchIngresoForm = function(){
             var params = {
                 opcion:0,
-                usuario: $scope.mantIngresosIn.usuario.id
+                usuario: $scope.mantIngresosIn.usuario.id,
+                isIngreso:0
             };
 
             if($scope.mantGastosView.cuenta!='0'){
@@ -151,9 +154,10 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
 
         };
 
+        // función que invoca a la operación de insert de transacciones
         $scope.sendIngresoForm = function(){
-
-            var params = {
+            if($scope.mantGastosView.cuantia || $scope.operacion==3){
+                var params = {
                     opcion: 2, // operación de alta
                     cuenta: $scope.mantGastosView.cuenta,
                     usuario: $scope.mantIngresosIn.usuario.id,
@@ -163,39 +167,40 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
                     cuantia: parseFloat($scope.mantGastosView.cuantia),
                     descripcion : $scope.mantGastosView.descripcion
                 };
-            if($scope.operacion==2){
-                // si la operación es modificación
-                params.opcion=3;
-                params.id = $scope.mantGastosView.id
-            }else if($scope.operacion==3){
-                // si es operacion de eliminar
-                params = {
-                    opcion:4,
-                    id: $scope.mantGastosView.id
+                if($scope.operacion==2){
+                    // si la operación es modificación
+                    params.opcion=3;
+                    params.id = $scope.mantGastosView.id
+                }else if($scope.operacion==3){
+                    // si es operacion de eliminar
+                    params = {
+                        opcion:4,
+                        id: $scope.mantGastosView.id
+                    }
                 }
+
+                $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
+                .then(function(respuesta){
+                    /*
+                        Esto se ejecuta si todo va bien. Podemos leer la respuesta
+                        que nos dio el servidor accediendo a la propiedad data
+                        Recordemos que tenemos que decodificarla, ya que si enviamos con JSON
+                        deben respondernos con JSON (no es obligatorio, pero sí es una buena práctica)
+                */
+                    console.log("Petición terminada. La respuesta es: ", angular.fromJson(respuesta.data));
+
+                    if(respuesta.data.response==true){
+                        $scope.abrirVentanaModalOk(respuesta.data.mensaje)
+
+                        $scope.getIngresosByUser();
+                        $scope.cleanForm();
+
+                    }else{
+                        $scope.abrirVentanaModalKo(respuesta.data.mensaje)
+                    }
+
+                });
             }
-
-            $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
-            .then(function(respuesta){
-                /*
-                    Esto se ejecuta si todo va bien. Podemos leer la respuesta
-                    que nos dio el servidor accediendo a la propiedad data
-                    Recordemos que tenemos que decodificarla, ya que si enviamos con JSON
-                    deben respondernos con JSON (no es obligatorio, pero sí es una buena práctica)
-            */
-                console.log("Petición terminada. La respuesta es: ", angular.fromJson(respuesta.data));
-
-                if(respuesta.data.response==true){
-                    $scope.abrirVentanaModalOk(respuesta.data.mensaje)
-
-                    $scope.getIngresosByUser();
-                    $scope.cleanForm();
-
-                }else{
-                    $scope.abrirVentanaModalKo(respuesta.data.mensaje)
-                }
-
-            });
         };
 
         $scope.eliminarIngreso = function(seleccionado){
@@ -209,7 +214,7 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
             $scope.mantGastosView.id = seleccionado.id;
             $scope.mantGastosView.cuenta = seleccionado.cuenta;
             $scope.mantGastosView.tipoIngreso = seleccionado.tipo;
-            $scope.mantGastosView.fecha = new Date(seleccionado.fecha);
+            $scope.mantGastosView.fecha = formatDate(seleccionado.fecha);
             $scope.mantGastosView.asunto = seleccionado.asunto;
             $scope.mantGastosView.descripcion = seleccionado.descripcion;
             $scope.mantGastosView.cuantia = parseFloat(seleccionado.cuantia);
@@ -217,6 +222,11 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
             $scope.mantGastosView.pantalla=1;
             $scope.operacion=2;
         };
+
+        function formatDate(fecha){
+            var fechaSplit = fecha.split("-");
+            return new Date(fechaSplit[1]+"-"+fechaSplit[0]+"-"+fechaSplit[2]);
+        }
 
         $scope.cleanForm = function(){
             // inicialización de variables
@@ -252,6 +262,8 @@ app.controller('MantGastosController', ['$scope','$http','$uibModal', function($
               }
             });
         };
+
+        
 
         // abre una ventana modal con operación KO
         $scope.abrirVentanaModalKo = function(message){

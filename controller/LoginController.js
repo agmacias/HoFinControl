@@ -1,11 +1,21 @@
 angular.module('app', [])
-    .controller('LoginController', ['$scope','$http', function($scope,$http) {        
+    .controller('LoginController', ['$scope','$http', function($scope,$http) {
+        $scope.init = function(){
+            if (localStorage.chkbx && localStorage.chkbx != '') {
+                $scope.rememberMe = localStorage.chkbx;
+                $scope.usuario = localStorage.usrname;
+                $scope.password = localStorage.pass
+            }
+        };
+
         $scope.sendLogin = function() {
             var loginIn = {
                 opcion: 1,
                 usuario: $scope.usuario,
                 password: $scope.password
             };
+
+            remember();
 
             $http.post("../dao/service/UsuarioService.php", angular.toJson(loginIn))
             .then(function(respuesta){
@@ -26,5 +36,17 @@ angular.module('app', [])
                 }
             });
         };
+
+        /* función que nos ayuda a guardar en localStorage los datos del login en caso de haber
+         * pulsado en el botón de recordar
+        */
+        function remember(){
+            if ($scope.rememberMe) {
+                // save username and password
+                localStorage.usrname = $scope.usuario;
+                localStorage.pass = $scope.password;
+                localStorage.chkbx = $scope.rememberMe;
+            }
+        }
     }]);
 

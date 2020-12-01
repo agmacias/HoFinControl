@@ -9,14 +9,14 @@ require_once '../../model/Cuentas.php';
 class CuentasDAO {
 
     /*
-     * Obtiene un listado de todas los registros de la tabla cuentas
+     * Obtiene un listado de todas los registros de la tabla cuentas según un usuario
     */
     public static function getCuentasByUser($user) {
         $conexion = DB::getConnection();
         $cuentas = array();
         try {
             // Consulta preparada
-            $sql = $conexion->prepare("SELECT cuentas.*, tipo_cuenta.nombre as tipoCuenta FROM cuentas inner join tipo_cuenta on cuentas.tipo=tipo_cuenta.id where (cuentas.fecha_fin is null or cuentas.fecha_fin>sysdate()) and usuario='".$user."';");
+            $sql = $conexion->prepare("SELECT cuentas.*, DATE_FORMAT(cuentas.fecha,'%d-%m-%Y') as fecha FROM cuentas where (cuentas.fecha_fin is null or cuentas.fecha_fin>sysdate()) and usuario='".$user."';");
 
             if($sql->execute()) {
                 while ($row = $sql->fetch()) {
@@ -24,7 +24,7 @@ class CuentasDAO {
                      * Construimos el objeto usuario a través del método explicito ya que queremos un objeto cargado con los datos
                      * que acabamos de leer de la base de datos.
                     */
-                    $cuentas[] = new Cuentas($row['id'], $row['nombre'], $row['tipoCuenta'], $row['usuario'], $row['fecha'], $row['cuantia'], $row['defecto'], $row['fecha_fin'], $row['tipo']);
+                    $cuentas[] = new Cuentas($row['id'], $row['nombre'], $row['usuario'], $row['fecha'], $row['cuantia'], $row['defecto'], $row['fecha_fin']);
                 }
             }
 
@@ -50,7 +50,7 @@ class CuentasDAO {
                      * Construimos el objeto usuario a través del método explicito ya que queremos un objeto cargado con los datos
                      * que acabamos de leer de la base de datos.
                     */
-                    $cuentas[] = new Cuentas($row['id'], $row['nombre'], $row['tipo'], $row['usuario'], $row['fecha'], $row['cuantia'], $row['defecto']);
+                    $cuentas[] = new Cuentas($row['id'], $row['nombre'], $row['usuario'], $row['fecha'], $row['cuantia'], $row['defecto']);
                 }
             }
 
@@ -63,8 +63,8 @@ class CuentasDAO {
     }
 
     // Inserta una cuenta según los parámetros pasados
-    public static function insertCuenta($nombre,$tipo,$usuario,$fecha,$cuantia,$defecto,$f_fin) {
-        $prepareSql = "INSERT into cuentas (nombre,tipo,usuario,fecha,cuantia,defecto,fecha_fin) VALUES (?,?,?,?,?,?,?);";
+    public static function insertCuenta($nombre,$usuario,$fecha,$cuantia,$defecto,$f_fin) {
+        $prepareSql = "INSERT into cuentas (nombre,usuario,fecha,cuantia,defecto,fecha_fin) VALUES (?,?,?,?,?,?);";
 
         try {
             // obtenemos la conexión y abrimos transacción
@@ -77,13 +77,12 @@ class CuentasDAO {
             $conexion -> beginTransaction();
             // preparamos la consulta y establecemos los parámetros
             $consulta = $conexion->prepare($prepareSql);
-            $consulta ->bindparam(1, $nombre);
-            $consulta ->bindparam(2, $tipo);
-            $consulta ->bindparam(3, $usuario);
-            $consulta ->bindparam(4, $fecha);
-            $consulta ->bindparam(5, $cuantia);
-            $consulta ->bindparam(6, $defecto);
-            $consulta ->bindparam(7, $f_fin);
+            $consulta ->bindparam(1, $nombre);            
+            $consulta ->bindparam(2, $usuario);
+            $consulta ->bindparam(3, $fecha);
+            $consulta ->bindparam(4, $cuantia);
+            $consulta ->bindparam(5, $defecto);
+            $consulta ->bindparam(6, $f_fin);
 
             // lanzamos la consulta, en caso de ir ok, lanzamos commit en caso contrario lanzamos rollback
             $ok = $consulta->execute();
@@ -131,8 +130,8 @@ class CuentasDAO {
         }
     }
 
-    public static function updateCuentaById($id,$nombre,$tipo,$fecha,$cuantia,$defecto,$f_fin) {
-        $prepareSql = "UPDATE cuentas set nombre=?, tipo=?, fecha=?, cuantia=?, defecto=?, fecha_fin=? where id = ?;";
+    public static function updateCuentaById($id,$nombre,$fecha,$cuantia,$defecto,$f_fin) {
+        $prepareSql = "UPDATE cuentas set nombre=?,fecha=?, cuantia=?, defecto=?, fecha_fin=? where id = ?;";
 
         try {
             // obtenemos la conexión y abrimos transacción
@@ -145,13 +144,12 @@ class CuentasDAO {
             $conexion -> beginTransaction();
             // preparamos la consulta y establecemos los parámetros
             $consulta = $conexion->prepare($prepareSql);
-            $consulta ->bindparam(1, $nombre);
-            $consulta ->bindparam(2, $tipo);
-            $consulta ->bindparam(3, $fecha);
-            $consulta ->bindparam(4, $cuantia);
-            $consulta ->bindparam(5, $defecto);
-            $consulta ->bindparam(6, $f_fin);
-            $consulta ->bindparam(7, $id);
+            $consulta ->bindparam(1, $nombre);            
+            $consulta ->bindparam(2, $fecha);
+            $consulta ->bindparam(3, $cuantia);
+            $consulta ->bindparam(4, $defecto);
+            $consulta ->bindparam(5, $f_fin);
+            $consulta ->bindparam(6, $id);
 
             // lanzamos la consulta, en caso de ir ok, lanzamos commit en caso contrario lanzamos rollback
             $ok = $consulta->execute();
@@ -198,6 +196,67 @@ class CuentasDAO {
             $conexion -> rollBack();
             return false;
         }
+    }
+
+    // montamos una consulta dinámica
+    public static function getCuentasByParams($user, $nombre,$cuantiaDesde,$cuantiaHasta,$fechaDesde,$fechaHasta){
+        $consulta ="SELECT *,DATE_FORMAT(fecha,'%d-%m-%Y') as fecha FROM cuentas where usuario='".$user."'";
+
+        if(isset($nombre)){
+            $consulta = $consulta." and nombre like :nombre";
+        }
+        if(isset($cuantiaDesde)){
+            $consulta = $consulta." and cuantia >= :cuantiaDesde";
+        }
+        if(isset($cuantiaHasta)){
+            $consulta = $consulta." and cuantia<= :cuantiaHasta";
+        }
+        if(isset($fechaDesde)){
+            $consulta = $consulta." and fecha>= :fechaDesde";
+        }
+        if(isset($fechaHasta)){
+            $consulta = $consulta." and fecha<= :fechaHasta";
+        }
+
+        $conexion = DB::getConnection();
+        $cuentas = array();
+        try {
+            // Consulta preparada
+            $sql = $conexion->prepare($consulta);
+
+            if(isset($nombre)){
+                $nombre = "%".$nombre."%";
+                $sql->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            }
+            if(isset($cuantiaDesde)){
+                $sql->bindParam(':cuantiaDesde', $cuantiaDesde, PDO::PARAM_STR);
+            }
+            if(isset($cuantiaHasta)){
+                $sql->bindParam(':cuantiaHasta', $cuantiaHasta, PDO::PARAM_STR);
+            }
+            if(isset($fechaDesde)){
+                $sql->bindParam(':fechaDesde', $fechaDesde, PDO::PARAM_STR);
+            }
+            if(isset($fechaHasta)){
+                $sql->bindParam(':fechaHasta', $fechaHasta, PDO::PARAM_STR);
+            }
+
+            if($sql->execute()) {
+                while ($row = $sql->fetch()) {
+                    /*
+                     * Construimos el objeto usuario a través del método explicito ya que queremos un objeto cargado con los datos
+                     * que acabamos de leer de la base de datos.
+                    */
+                    $cuentas[] = new Cuentas($row['id'], $row['nombre'], $row['usuario'], $row['fecha'], $row['cuantia'], $row['defecto'], $row['fecha_fin']);
+                }
+            }
+
+
+        } catch (PDOException $e) {
+            echo "ERROR - No se pudo acceder a la tabla paises: " . $e->getMessage();
+        }
+
+        return $cuentas;
     }
 }
 ?>

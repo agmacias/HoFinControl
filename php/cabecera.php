@@ -1,7 +1,18 @@
 <div ng-controller="CabeceraController" ng-init="init()">
+    
     <nav class="navbar navbar-default bg-primary navbar-absolute">
         <div class="container-fluid">
-            <div class="nabar-header">
+            <div>
+                <div id="topnav" class="topnav">
+                    <a href="#" ng-click="openNav()">
+                        <svg width="30" height="30" id="icoOpen">
+                            <path d="M0,5 30,5" stroke="#000" stroke-width="5"/>
+                            <path d="M0,14 30,14" stroke="#000" stroke-width="5"/>
+                            <path d="M0,23 30,23" stroke="#000" stroke-width="5"/>
+                        </svg>
+                    </a>
+                </div>
+                
                 <a class="navbar-brand" href="#">{{cabeceraView.pantalla}}</a>
             </div>
 

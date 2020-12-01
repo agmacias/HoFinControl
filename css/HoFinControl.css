@@ -44,6 +44,10 @@ body {
     background: #FFFFFF;
 }
 
+.submenu {
+    margin-left: 20px;
+}
+
 .logo{
     padding: 13px 15px;
 }
@@ -81,6 +85,12 @@ body {
     padding: 15px 15px 15px 0px;
 }
 
+.fa-list-alt{
+    color: #04B404;
+    padding-right: 30px;
+    font-size: 30px;
+}
+
 .fa-bar-chart{
     color: orange;
     padding-right: 30px;
@@ -112,6 +122,11 @@ body {
     color: #000000;
 }
 
+.fa-angle-double-right, .fa-angle-double-left{
+    font-size: 17px;
+    cursor: pointer;
+}
+
 .close{
     padding: 15px 15px 15px 0px;
 }
@@ -136,10 +151,22 @@ body {
     padding-right: 10px;
 }
 
+.textNormal{
+    font-weight: normal;
+}
+
 .card-margin {
     margin-top: 20px;
     color: #000000;
     font-weight: bold;
+}
+
+.card-head-list{
+    margin: 10px 0px 10px 0px;
+    padding: 10px 0px 10px 10px;
+    color: #ffffff;
+    font-weight: bold;
+    background-color: #000000;
 }
 
 .card-margin .card-header {
@@ -190,6 +217,39 @@ tbody > tr > td, thead > tr > td {
     cursor: pointer;
 }
 
+/* Estilos para el menu */
+.closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    text-decoration: none!important;
+}
+.topnav{
+    display: none;
+}
+
+.topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 8px 10px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+    background-color: #4CAF50;
+    color: white;
+}
 
 /*ESTILOS DE LA PANTALLA DE LOGIN*/
 .form-control {
@@ -252,9 +312,7 @@ tbody > tr > td, thead > tr > td {
     border: none;
     margin-bottom: 20px;
 }
-/*.login-form .btn:hover, .login-form .btn:focus {
-    background: #50b8b3 !important;
-}*/
+
 .login-form a {
     color: #007bff;
     text-decoration: underline;

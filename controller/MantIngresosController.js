@@ -22,7 +22,8 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
 
             // limpiamos el formulario;
             $scope.mantIngresosView={                
-                tipoIngreso:"0",
+                tipoIngreso:"",
+                cuenta:"",
                 pantalla:1
             };
 
@@ -79,7 +80,7 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
 
                     $scope.data.tipo_ingreso = respuesta.data;
                     // establecemos el elemento por defecto
-                    $scope.mantIngresosView.tipoIngreso = "0";                   
+                    $scope.mantIngresosView.tipoIngreso = "0";
 
               });
         };
@@ -87,7 +88,8 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
         $scope.searchIngresoForm = function(){
             var params = {
                 opcion:0,
-                usuario: $scope.mantIngresosIn.usuario.id
+                usuario: $scope.mantIngresosIn.usuario.id,
+                isIngreso:1
             };
 
             if($scope.mantIngresosView.cuenta!='0'){
@@ -152,8 +154,8 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
         };
 
         $scope.sendIngresoForm = function(){
-
-            var params = {
+           if($scope.mantIngresosView.cuantia || $scope.operacion==3){
+               var params = {
                     opcion: 2, // operación de alta
                     cuenta: $scope.mantIngresosView.cuenta,
                     usuario: $scope.mantIngresosIn.usuario.id,
@@ -163,39 +165,40 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
                     cuantia: parseFloat($scope.mantIngresosView.cuantia),
                     descripcion : $scope.mantIngresosView.descripcion
                 };
-            if($scope.operacion==2){
-                // si la operación es modificación
-                params.opcion=3;
-                params.id = $scope.mantIngresosView.id
-            }else if($scope.operacion==3){
-                // si es operacion de eliminar
-                params = {
-                    opcion:4,
-                    id: $scope.mantIngresosView.id
-                }
-            }
-
-            $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
-            .then(function(respuesta){
-                /*
-                    Esto se ejecuta si todo va bien. Podemos leer la respuesta
-                    que nos dio el servidor accediendo a la propiedad data
-                    Recordemos que tenemos que decodificarla, ya que si enviamos con JSON
-                    deben respondernos con JSON (no es obligatorio, pero sí es una buena práctica)
-            */
-                console.log("Petición terminada. La respuesta es: ", angular.fromJson(respuesta.data));
-
-                if(respuesta.data.response==true){
-                    $scope.abrirVentanaModalOk(respuesta.data.mensaje)
-
-                    $scope.getIngresosByUser();
-                    $scope.cleanForm();
-
-                }else{
-                    $scope.abrirVentanaModalKo(respuesta.data.mensaje)
+                if($scope.operacion==2){
+                    // si la operación es modificación
+                    params.opcion=3;
+                    params.id = $scope.mantIngresosView.id
+                }else if($scope.operacion==3){
+                    // si es operacion de eliminar
+                    params = {
+                        opcion:4,
+                        id: $scope.mantIngresosView.id
+                    }
                 }
 
-            });
+                $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
+                .then(function(respuesta){
+                    /*
+                        Esto se ejecuta si todo va bien. Podemos leer la respuesta
+                        que nos dio el servidor accediendo a la propiedad data
+                        Recordemos que tenemos que decodificarla, ya que si enviamos con JSON
+                        deben respondernos con JSON (no es obligatorio, pero sí es una buena práctica)
+                */
+                    console.log("Petición terminada. La respuesta es: ", angular.fromJson(respuesta.data));
+
+                    if(respuesta.data.response==true){
+                        $scope.abrirVentanaModalOk(respuesta.data.mensaje)
+
+                        $scope.getIngresosByUser();
+                        $scope.cleanForm();
+
+                    }else{
+                        $scope.abrirVentanaModalKo(respuesta.data.mensaje)
+                    }
+
+                });
+           }
         };
 
         $scope.eliminarIngreso = function(seleccionado){
@@ -209,7 +212,7 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
             $scope.mantIngresosView.id = seleccionado.id;
             $scope.mantIngresosView.cuenta = seleccionado.cuenta;
             $scope.mantIngresosView.tipoIngreso = seleccionado.tipo;
-            $scope.mantIngresosView.fecha = new Date(seleccionado.fecha);
+            $scope.mantIngresosView.fecha = formatDate(seleccionado.fecha);
             $scope.mantIngresosView.asunto = seleccionado.asunto;
             $scope.mantIngresosView.descripcion = seleccionado.descripcion;
             $scope.mantIngresosView.cuantia = parseFloat(seleccionado.cuantia);
@@ -217,6 +220,11 @@ app.controller('MantIngresosController', ['$scope','$http','$uibModal', function
             $scope.mantIngresosView.pantalla=1;
             $scope.operacion=2;
         };
+
+        function formatDate(fecha){
+            var fechaSplit = fecha.split("-");
+            return new Date(fechaSplit[1]+"-"+fechaSplit[0]+"-"+fechaSplit[2]);
+        }
 
         $scope.cleanForm = function(){
             // inicialización de variables

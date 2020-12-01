@@ -17,6 +17,13 @@ app.controller('CabeceraController', ['$scope','$http', function($scope,$http) {
                 window.location.href=angular.fromJson(respuesta.data);
 
             });
+        };
+
+        // función que nos vale para replegar nuevamente el menú lateral.
+        $scope.openNav = function() {
+            document.getElementById("sideNavigation").style.display = "";
+            document.getElementById("panelPrincipal").style.width = "80%";
+            document.getElementById("topnav").style.display = "none";
         }
         
     }]);

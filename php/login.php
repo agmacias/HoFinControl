@@ -11,7 +11,7 @@
         <script src="../controller/LoginController.js"></script>
     </head>
     <body ng-app="app">
-        <div class="login-form login" ng-controller="LoginController">
+        <div class="login-form login" ng-controller="LoginController" ng-init="init()">
             <form>
                 <div class="avatar">
                     <img src="../img/avatar.png" alt="Avatar">
@@ -28,7 +28,7 @@
                     <button type="submit" ng-click="sendLogin()" class="btn btn-primary btn-lg btn-block">Login</button>
                 </div>
                 <div class="bottom-action clearfix">
-                    <label class="float-left form-check-label"><input type="checkbox">Recuérdame</label>
+                    <label class="float-left form-check-label"><input ng-model="rememberMe" value="1" type="checkbox">Recuérdame</label>
                     <!--<a href="#" class="float-right">¿Olvidaste la contraseña?</a>-->
                 </div>
             </form>

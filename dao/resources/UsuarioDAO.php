@@ -76,7 +76,13 @@ class UsuarioDAO {
     }
 
     public static function updateUsuario($id,$usuario,$contrasenia,$nombre,$apellido1,$apellido2,$f_nacimiento,$pais,$telefono,$direccion,$email) {
-        $prepareSql = "UPDATE usuarios SET user = ?, password=md5(?), nombre=?, apellido1=?, apellido2=?, f_nacimiento=?, pais=?, telefono=?, direccion=?, mail=? where id=?;";
+        $prepareSql = "UPDATE usuarios SET user = ?, nombre=?, apellido1=?, apellido2=?, f_nacimiento=?, pais=?, telefono=?, direccion=?, mail=?";
+
+        if(isset($contrasena)){
+            $prepareSql = $prepareSql." , password=md5(?)";
+        }
+
+        $prepareSql = $prepareSql."where id=?;";
 
         try {
             // obtenemos la conexión y abrimos transacción
@@ -89,17 +95,22 @@ class UsuarioDAO {
             $conexion -> beginTransaction();
             // preparamos la consulta y establecemos los parámetros
             $consulta = $conexion->prepare($prepareSql);
-            $consulta ->bindparam(1, $usuario);
-            $consulta ->bindparam(2, $contrasenia);
-            $consulta ->bindparam(3, $nombre);
-            $consulta ->bindparam(4, $apellido1);
-            $consulta ->bindparam(5, $apellido2);
-            $consulta ->bindparam(6, $f_nacimiento);
-            $consulta ->bindparam(7, $pais);
-            $consulta ->bindparam(8, $telefono);
-            $consulta ->bindparam(9, $direccion);
-            $consulta ->bindparam(10, $email);
-            $consulta ->bindparam(11, $id);
+            $consulta ->bindparam(1, $usuario);            
+            $consulta ->bindparam(2, $nombre);
+            $consulta ->bindparam(3, $apellido1);
+            $consulta ->bindparam(4, $apellido2);
+            $consulta ->bindparam(5, $f_nacimiento);
+            $consulta ->bindparam(6, $pais);
+            $consulta ->bindparam(7, $telefono);
+            $consulta ->bindparam(8, $direccion);
+            $consulta ->bindparam(9, $email);
+            if(isset($contrasena)){
+                $consulta ->bindparam(10, $contrasenia);
+                $consulta ->bindparam(11, $id);
+            }else{
+                $consulta ->bindparam(10, $id);
+            }
+
 
 
             // lanzamos la consulta, en caso de ir ok, lanzamos commit en caso contrario lanzamos rollback
@@ -156,6 +167,74 @@ class UsuarioDAO {
             $conexion -> rollBack();
             return false;
         }
+    }
+
+    // lanza una consulta para obtener todos los usuarios dados de alta
+    public static function getUsuariosByParams($usuario,$nombre,$apellido,$apellido2,$fechaDesde,$fechaHasta){
+        $conexion = DB::getConnection();
+        $usuarios = array();
+        try {
+            // Consulta preparada
+            $consulta = "SELECT * FROM usuarios where id!=1 ";
+
+            if(isset($usuario)){
+                $consulta = $consulta." and user like :usuario ";
+            }
+            if(isset($nombre)){
+                $consulta = $consulta." and nombre like :nombre";
+            }
+            if(isset($apellido)){
+                $consulta = $consulta." and apellido_1 like :apellido";
+            }
+            if(isset($apellido2)){
+                $consulta = $consulta." and apellido_2 like :apellido2'";
+            }            
+            if(isset($fechaDesde)){
+                $consulta = $consulta." and f_nacimiento >= :fechaDesde ";
+            }
+            if(isset($fechaHasta)){
+                $consulta = $consulta." and f_nacimiento <= :fechaHasta ";
+            }
+
+            $sql = $conexion->prepare($consulta);
+            
+            if(isset($usuario)){
+               $usuario = "%".$usuario."%";
+               $sql->bindParam(':usuario', $usuario, PDO::PARAM_STR);
+            }
+            if(isset($nombre)){
+               $nombre = "%".$nombre."%";
+               $sql->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            }
+            if(isset($apellido)){
+               $usuario = "%".$apellido."%";
+               $sql->bindParam(':apellido1', $apellido, PDO::PARAM_STR);
+            }
+            if(isset($apellido2)){
+               $apellido2 = "%".$apellido2."%";
+               $sql->bindParam(':apellido2', $apellido2, PDO::PARAM_STR);
+            }
+            if(isset($fechaDesde)){
+               $sql->bindParam(':fechaDesde', $fechaDesde, PDO::PARAM_STR);
+            }
+            if(isset($fechaHasta)){
+               $sql->bindParam(':fechaHasta', $fechaHasta, PDO::PARAM_STR);
+            }
+
+            if($sql->execute()) {
+                while ($row = $sql->fetch()) {
+                    /*
+                     * Construimos el objeto usuario a través del método explicito ya que queremos un objeto cargado con los datos
+                     * que acabamos de leer de la base de datos.
+                    */
+                    $usuarios[] = new Usuario($row['id'], $row['user'], $row['password'], $row['nombre'], $row['apellido1'], $row['apellido2'], $row['f_nacimiento'], $row['pais'], $row['telefono'], $row['direccion'], $row['mail']);
+                }
+            }
+        } catch (PDOException $e) {
+            echo "ERROR - No se pudo acceder a la tabla usuarios: " . $e->getMessage();
+        }
+
+        return $usuarios;
     }
 }
 ?>

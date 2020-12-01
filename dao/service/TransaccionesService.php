@@ -13,20 +13,40 @@ $datos = json_decode(file_get_contents("php://input"));
 $response = array();
 $opcion = $datos->opcion;
 
-if($opcion==0) {
+if($opcion==0 || $opcion==8) {
     $user = $datos->usuario;
     $cuenta = null;
     $tipo = null;
     $fechaDesde = null;
     $fechaHasta = null;
     $asunto = null;
+    $limit = null;
+    $isIngreso = null;
+    $groupBy = null;
 
-    if(isset($datos->cuenta)){
-        $cuenta = $datos->cuenta;
+    if($opcion==8){
+        // si opcion es igual a 8 los atributos cuenta y tipo vendrán como array
+        if(isset($datos->cuenta)){
+            $cuenta = 0;
+            foreach ($datos->cuenta as $k => $row) {
+                $cuenta = $cuenta.",".$row;
+            }
+        }
+        if(isset($datos->tipo)){
+            $tipo = 0;
+            foreach ($datos->tipo as $k => $row) {
+                $tipo = $tipo.",".$row;
+            }
+        }
+    }else{
+        if(isset($datos->cuenta)){
+            $cuenta = $datos->cuenta;
+        }
+        if(isset($datos->tipo)){
+            $tipo = $datos->tipo;
+        }
     }
-    if(isset($datos->tipo)){
-        $tipo = $datos->tipo;
-    }
+    
     if(isset($datos->fechaDesde)){
         $fechaDesde = $datos->fechaDesde;
     }
@@ -36,9 +56,17 @@ if($opcion==0) {
     if(isset($datos->asunto)){
         $asunto = $datos->asunto;
     }
+    if(isset($datos->isIngreso)){
+        $isIngreso = $datos->isIngreso;
+    }
+    if(isset($datos->groupBy)){
+        $groupBy = $datos->groupBy;
+    }
+    if(isset($datos->limit)){
+        $limit = $datos->limit;
+    }
     
-    
-    $cuentas = TransaccionesDAO::getTransaccionesByParams($user, $cuenta, $tipo, $fechaDesde, $fechaHasta, $asunto);
+    $cuentas = TransaccionesDAO::getTransaccionesByParams($user, $cuenta, $tipo, $fechaDesde, $fechaHasta, $asunto, $isIngreso, $groupBy, $limit);
     foreach ($cuentas as $k => $row) {
         $response[]=array("id"=>$row->getId(),"tipo"=>$row->getTipoId(),
                 "tipo_nombre"=>$row->getTipoNombre(),

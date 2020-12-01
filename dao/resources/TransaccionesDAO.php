@@ -17,7 +17,7 @@ class TransaccionesDAO {
         $cuentas = array();
         try {
             // Consulta preparada
-            $sql = $conexion->prepare("SELECT transacciones.*,tipo_ingreso_gasto.nombre as nombre_ingreso_gasto,cuentas.nombre as nombreCuenta from transacciones inner join tipo_ingreso_gasto on transacciones.ingreso_gasto = tipo_ingreso_gasto.id inner join HoFiControl.cuentas on transacciones.cuenta = cuentas.id  where transacciones.usuario = :user and tipo_ingreso_gasto.isIngreso= :tipoIngreso");
+            $sql = $conexion->prepare("SELECT transacciones.*,tipo_ingreso_gasto.nombre as nombre_ingreso_gasto,cuentas.nombre as nombreCuenta, DATE_FORMAT(transacciones.f_transaccion,'%d-%m-%Y') as f_transaccion from transacciones inner join tipo_ingreso_gasto on transacciones.ingreso_gasto = tipo_ingreso_gasto.id inner join cuentas on transacciones.cuenta = cuentas.id  where transacciones.usuario = :user and tipo_ingreso_gasto.isIngreso= :tipoIngreso");
             $sql->bindParam(':user', $user, PDO::PARAM_INT);
             $sql->bindParam(':tipoIngreso', $tipoIngreso, PDO::PARAM_INT);
 
@@ -40,18 +40,18 @@ class TransaccionesDAO {
     }
 
     // obtiene las transacciones enf unción de los parámetros recibidos
-    public static function getTransaccionesByParams($user, $cuenta, $tipo, $fechaDesde, $fechaHasta, $asunto) {
+    public static function getTransaccionesByParams($user, $cuenta, $tipo, $fechaDesde, $fechaHasta, $asunto, $tipoIngreso, $groupBy, $limit) {
         $conexion = DB::getConnection();
         $cuentas = array();
         try {
-            $consulta = "SELECT transacciones.*,tipo_ingreso_gasto.nombre as nombre_ingreso_gasto,cuentas.nombre as nombreCuenta from transacciones inner join tipo_ingreso_gasto on transacciones.ingreso_gasto = tipo_ingreso_gasto.id inner join HoFiControl.cuentas on transacciones.cuenta = cuentas.id  where transacciones.usuario = :user";
+            $consulta = "SELECT transacciones.*,tipo_ingreso_gasto.nombre as nombre_ingreso_gasto,cuentas.nombre as nombreCuenta, DATE_FORMAT(transacciones.f_transaccion,'%d-%m-%Y') as f_transaccion from transacciones inner join tipo_ingreso_gasto on transacciones.ingreso_gasto = tipo_ingreso_gasto.id inner join cuentas on transacciones.cuenta = cuentas.id  where transacciones.usuario = :user";
 
             // montar la consulta en función de los parámetros recibidos
             if(isset($cuenta)){
-               $consulta = $consulta." and transacciones.cuenta = :cuenta ";
+               $consulta = $consulta." and transacciones.cuenta in(".$cuenta.") ";
             }
             if(isset($tipo)){
-               $consulta = $consulta." and transacciones.ingreso_gasto = :tipo ";
+               $consulta = $consulta." and transacciones.ingreso_gasto in(".$tipo.")";
             }
             if(isset($fechaDesde)){
                $consulta = $consulta." and transacciones.f_transaccion >= :fechaDesde ";
@@ -62,18 +62,36 @@ class TransaccionesDAO {
             if(isset($asunto)){
                $consulta = $consulta." and transacciones.asunto like  :asunto  ";
             }
+            if(isset($tipoIngreso)){
+                $consulta = $consulta." and tipo_ingreso_gasto.isIngreso = :tipoIngreso";
+            }
+            if(isset($limit)){
+                $consulta = $consulta." limit :limite  ";
+            }
+            if(isset($groupBy)){
+                /* no podemos agrupar, sino devolveríamos menos registros debido a que estarían agrupados
+                 * devolveremos los registros ordenados y le daremos el control al front para que pueda
+                 * agrupar de una manera más óptima estos registros
+                 */
+                if($groupBy=="cuenta"){
+                    $consulta = $consulta." order by transacciones.cuenta";
+                }else{
+                    $consulta = $consulta." order by ingreso_gasto";
+                }
+
+            }
             // Consulta preparada
             $sql = $conexion->prepare($consulta);
 
             // establecemos los valores
             $sql->bindParam(':user', $user, PDO::PARAM_INT);
 
-            if(isset($cuenta)){
+            /*if(isset($cuenta)){
                $sql->bindParam(':cuenta', $cuenta, PDO::PARAM_INT);
             }
             if(isset($tipo)){
                $sql->bindParam(':tipo', $tipo, PDO::PARAM_INT);
-            }
+            }*/
             if(isset($fechaDesde)){
                $sql->bindParam(':fechaDesde', $fechaDesde, PDO::PARAM_STR);
             }
@@ -83,6 +101,12 @@ class TransaccionesDAO {
             if(isset($asunto)){
                $asunto= "%".$asunto."%";
                $sql->bindParam(':asunto', $asunto, PDO::PARAM_STR);
+            }
+            if(isset($tipoIngreso)){
+                $sql->bindParam(':tipoIngreso', $tipoIngreso, PDO::PARAM_INT);
+            }
+            if(isset($limit)){
+                $sql->bindParam(':limite', $limit, PDO::PARAM_INT);
             }
 
             if($sql->execute()) {
@@ -268,7 +292,7 @@ class TransaccionesDAO {
     }
 
     public static function getGastosByUserYearAndCount($user,$cuenta,$anio){
-        $consulta = "select sum(cuantia) as cuantia, nombre from HoFiControl.transacciones tran inner join HoFiControl.tipo_ingreso_gasto tip on tran.ingreso_gasto = tip.id where YEAR(f_transaccion)=:anio and usuario=:usuario and cuenta=:cuenta and isIngreso=0 group by(ingreso_gasto);";
+        $consulta = "select sum(cuantia) as cuantia, nombre from transacciones tran inner join tipo_ingreso_gasto tip on tran.ingreso_gasto = tip.id where YEAR(f_transaccion)=:anio and usuario=:usuario and cuenta=:cuenta and isIngreso=0 group by(ingreso_gasto);";
 
         $conexion = DB::getConnection();
         $transacciones = array();

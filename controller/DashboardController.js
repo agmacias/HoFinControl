@@ -13,27 +13,32 @@ app.controller('DashBoardController', ['$scope','$http', function($scope,$http) 
             "11": "Noviembre",
             "12": "Diciembre"
         };
-        $scope.init = function(){         
-            /*$scope.etiquetasPie = ['Facturas', 'Luz', 'Agua', 'Alquiler'];
-            
-            $scope.dataPie = [100, 80, 30, 10];*/
-
-            $scope.dashboardView={};
-            $scope.dashboardView.total=0;
+        $scope.init = function(){
+            $scope.dashboardView={                
+                transacciones:[],                
+                styleCuentaSpinner:"spinner-border text-primary",
+                styleTotalCuentaSpinner:"spinner-border text-primary",
+                styleTotalGastosSpinner:"spinner-border text-primary",
+                styleTotalIngresosSpinner:"spinner-border text-primary",
+                styleFluctuacionesAnual:"spinner-border text-primary",
+                styleGastosAnual:"spinner-border text-primary",
+            };
             $scope.dashboardIn={
                 usuario: $scope.$parent.data
             };
 
             $scope.getCuentas();
+            $scope.getUltimasTransacciones();
            
         };
 
-        $scope.getTotalGastosIngresos = function(totalCuenta){
+        // obtiene los totales de los gastos e ingresos
+        $scope.getTotalGastosIngresos = function(totalCuenta,cuenta){
 
             var params = {
                 opcion:5,
                 usuario: $scope.dashboardIn.usuario.id,
-                cuenta: $scope.cuenta
+                cuenta: cuenta
             };
 
             $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
@@ -46,11 +51,16 @@ app.controller('DashBoardController', ['$scope','$http', function($scope,$http) 
                 */
                     console.log("Petición terminada. La respuesta es: ", angular.fromJson(respuesta.data));
 
-                    $scope.dashboardView.total_gastos = respuesta.data[0].total_gasto;
-                    $scope.dashboardView.total_ingresos = respuesta.data[0].total_ingreso;
+                    $scope.dashboardView.total_gastos = respuesta.data[0].total_gasto==null?0:respuesta.data[0].total_gasto;
+                    $scope.dashboardView.total_ingresos = respuesta.data[0].total_ingreso==null?0:respuesta.data[0].total_ingreso;
 
                     // total en cuenta
-                    $scope.dashboardView.total = (totalCuenta - parseFloat($scope.dashboardView.total_gastos)) + parseFloat($scope.dashboardView.total_ingresos);
+                    $scope.dashboardView.total = ((totalCuenta - parseFloat($scope.dashboardView.total_gastos)) + parseFloat($scope.dashboardView.total_ingresos)).toFixed(2);
+
+                    $scope.dashboardView.styleTotalCuentaSpinner="";
+                    $scope.dashboardView.styleTotalGastosSpinner="";
+                    $scope.dashboardView.styleTotalIngresosSpinner="";
+
               });
         };
         // obtiene un listado de cuentas según el usuario
@@ -73,29 +83,43 @@ app.controller('DashBoardController', ['$scope','$http', function($scope,$http) 
                     $scope.data.cuentas = respuesta.data;
                     // establecemos el elemento por defecto
                     var totalCuenta = 0;
+                    var cuenta=null;
                     angular.forEach($scope.data.cuentas,function(elto){
                         if(elto.defecto==1){
-                            $scope.cuenta = elto.id;
+                            cuenta = elto.id;
                             totalCuenta = parseFloat(elto.cuantia);
-                            //$scope.dashboardView.total = (parseFloat(elto.cuantia) - parseFloat($scope.dashboardView.total_gastos)) + parseFloat($scope.dashboardView.total_ingresos);
+                            $scope.dashboardView.nombreCuenta = elto.nombre;                            
                         }
                     });
 
-                    $scope.getTotalGastosIngresos(totalCuenta);
-                    $scope.getFluctuacionesAnual();
-                    $scope.getGastosAnual();
+                    $scope.dashboardView.styleCuentaSpinner="";
 
+                    if(cuenta!=null){
+                        $scope.getTotalGastosIngresos(totalCuenta,cuenta);
+                        $scope.getFluctuacionesAnual(cuenta);
+                        $scope.getGastosAnual(cuenta);
+                    }else{
+                        $scope.dashboardView.nombreCuenta="-"
+                        $scope.dashboardView.total=0;
+                        $scope.dashboardView.total_gastos=0;
+                        $scope.dashboardView.total_ingresos=0;
+                        $scope.dashboardView.styleTotalCuentaSpinner="";
+                        $scope.dashboardView.styleTotalGastosSpinner="";
+                        $scope.dashboardView.styleTotalIngresosSpinner="";
+                        $scope.dashboardView.styleFluctuacionesAnual="";
+                        $scope.dashboardView.styleGastosAnual="";
+                    }
               });
         };
 
         // realizará una llamada a TransaccionesService para obtener los gastos según el año
-        $scope.getFluctuacionesAnual= function(){
+        $scope.getFluctuacionesAnual= function(cuenta){
             var fecha = new Date();
             var params = {
                 opcion:6,
                 usuario: $scope.dashboardIn.usuario.id,
                 anio: fecha.getFullYear(),
-                cuenta: $scope.cuenta
+                cuenta: cuenta
             };
 
             $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
@@ -144,17 +168,19 @@ app.controller('DashBoardController', ['$scope','$http', function($scope,$http) 
                     $scope.datos.push(arrayIngresos);
                     $scope.datos.push(arrayGastos);
 
+                    $scope.dashboardView.styleFluctuacionesAnual="";
+
               });
         };
 
         // obtiene los gastos anuales de un usuario agrupados por tipo de gasto
-        $scope.getGastosAnual= function(){
+        $scope.getGastosAnual= function(cuenta){
             var fecha = new Date();
             var params = {
                 opcion:7,
                 usuario: $scope.dashboardIn.usuario.id,
                 anio: fecha.getFullYear(),
-                cuenta: $scope.cuenta
+                cuenta: cuenta
             };
 
             $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
@@ -175,7 +201,29 @@ app.controller('DashBoardController', ['$scope','$http', function($scope,$http) 
                         $scope.dataPie.push(elto.cuantia);
                     });
 
+                    $scope.dashboardView.styleGastosAnual="";
               });
         };
 
+        $scope.getUltimasTransacciones = function(){
+            var params = {
+                opcion:0,
+                usuario: $scope.dashboardIn.usuario.id,
+                limit: 5
+            };
+
+            $http.post("../dao/service/TransaccionesService.php", angular.toJson(params))
+            .then(function(respuesta){
+                    /*
+                        Esto se ejecuta si todo va bien. Podemos leer la respuesta
+                        que nos dio el servidor accediendo a la propiedad data
+                        Recordemos que tenemos que decodificarla, ya que si enviamos con JSON
+                        deben respondernos con JSON (no es obligatorio, pero sí es una buena práctica)
+                */
+                    console.log("Petición terminada. La respuesta es: ", angular.fromJson(respuesta.data));
+                    
+                    $scope.dashboardView.transacciones= respuesta.data;
+              });
+        }
+        
   }]);

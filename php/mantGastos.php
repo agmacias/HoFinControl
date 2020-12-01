@@ -14,7 +14,7 @@
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
-                                <label class ="cabeceraLabel" for="tipoIngreso"><u>T</u>ipo ingreso:</label>
+                                <label class ="cabeceraLabel" for="tipoIngreso"><u>T</u>ipo gasto:</label>
                                 <select name="tipoIngreso" id="tipoIngreso" ng-model="mantGastosView.tipoIngreso" class="form-control" accesskey="T" tabindex="2">
                                     <option value="0" selected="selected">Seleccione un tipo</option>
                                     <option ng-repeat="option in data.tipo_ingreso" value="{{option.id}}">{{option.nombre}}</option>
@@ -40,7 +40,7 @@
                     <div class="form-row">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary btn-sm" id="buscar" name="buscar" tabindex="7" ng-click="searchIngresoForm()">Buscar</button>
-                            <button type="submit" class="btn btn-primary btn-sm" id="nuevo" name="nuevo" tabindex="6" ng-click="changeToNew()">Nuevo</button>
+                            <button type="submit" class="btn btn-primary btn-sm" id="nuevo" name="nuevo" tabindex="6" ng-click="changeToNew()">Nuevo</button>                            
                         </div>
                     </div>
                 </div>
@@ -48,11 +48,11 @@
                 <div class="row" ng-if="mantGastosView.pantalla==0">
                     <div class="col-lg-12 col-md-12">
                         <div class="card card-margin">
-                            <table class="table table-striped" style="text-align: left">
+                            <table id="table2excel" class="table table-striped" style="text-align: left">
                                 <thead>
                                     <tr>
                                         <th scope="col">Cuenta</th>
-                                        <th scope="col">Tipo Ingreso</th>
+                                        <th scope="col">Tipo gasto</th>
                                         <th scope="col">Fecha</th>
                                         <th scope="col">Asunto</th>
                                         <th scope="col">Cuantia</th>
@@ -99,15 +99,15 @@
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label class ="cabeceraLabel" for="tipo"><u>C</u>uenta (obligatorio):</label>
-                                <select name="tipo" id="tipo" ng-model="mantGastosView.cuenta" class="form-control" accesskey="C" tabindex="1">
-                                    <option value="0" selected="selected">Seleccione una cuenta</option>
+                                <select name="tipo" id="tipo" ng-model="mantGastosView.cuenta" class="form-control" accesskey="C" tabindex="1" required>
+                                    <option value="" selected="selected">Seleccione una cuenta</option>
                                     <option ng-repeat="option in data.cuentas" value="{{option.id}}">{{option.nombre}}</option>
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
-                                <label class ="cabeceraLabel" for="tipoIngreso"><u>T</u>ipo ingreso (obligatorio):</label>
-                                <select name="tipoIngreso" id="tipoIngreso" ng-model="mantGastosView.tipoIngreso" class="form-control" accesskey="T" tabindex="2">
-                                    <option value="0" selected="selected">Seleccione un tipo</option>
+                                <label class ="cabeceraLabel" for="tipoIngreso"><u>T</u>ipo gasto (obligatorio):</label>
+                                <select name="tipoIngreso" id="tipoIngreso" ng-model="mantGastosView.tipoIngreso" class="form-control" accesskey="T" tabindex="2" required>
+                                    <option value="" selected="selected">Seleccione un tipo</option>
                                     <option ng-repeat="option in data.tipo_ingreso" value="{{option.id}}">{{option.nombre}}</option>
                                 </select>
                             </div>
@@ -120,7 +120,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label class ="cabeceraLabel" for="cuantia">C<u>u</u>antía: (Obligatoria)</label>
-                                <input type="number" class="form-control" id="cuantia" ng-model="mantGastosView.cuantia" placeholder="Cuantía" accesskey="C" tabindex="3" maxlength="14" step='0.01' value='0.00' placeholder='0.00' required/>
+                                <input type="number" class="form-control" id="cuantia" ng-model="mantGastosView.cuantia" placeholder="Cuantía" accesskey="C" tabindex="3" maxlength="14" step='0.01' placeholder='0.00' required/>
                             </div>
                             <div class="form-group col-md-8">
                                 <label class ="cabeceraLabel" for="asunto"><u>A</u>sunto: (Obligatorio)</label>

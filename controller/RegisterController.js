@@ -24,10 +24,11 @@ app.controller('RegisterController', ['$scope','$http','$uibModal', function($sc
               });
         };
 
+        // función que realiza la llamada al servicio de alta de usuario
         $scope.sendRegister = function() {
             if($scope.profileView.contrasena==$scope.profileView.contrasena2){
                 var updateData = {
-                    opcion:2, // modificación del perfil de usuario
+                    opcion:2, // alta del perfil de usuario
                     id: $scope.profileView.id,
                     usuario: $scope.profileView.usuario,
                     nombre: $scope.profileView.nombre,

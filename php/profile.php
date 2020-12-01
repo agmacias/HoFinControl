@@ -47,8 +47,8 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-8">
-                                <label class ="cabeceraLabel" for="mail"><u>E</u>-Mail:</label>
-                                <input type="text" class="form-control" id="mail" placeholder="E-Mail" ng-model="profileView.mail" accesskey="D" tabindex="8" maxlength="50" />
+                                <label class ="cabeceraLabel" for="mail"><u>E</u>-Mail (Obligatorio):</label>
+                                <input type="email" class="form-control" id="mail" placeholder="E-Mail" ng-model="profileView.mail" accesskey="D" tabindex="8" maxlength="50" required/>
                             </div>
                         </div>
                         <div class="form-row">
@@ -70,7 +70,7 @@
                     <div class="form-row">
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary btn-sm" id="acepar" name="aceptar" tabindex="33" ng-click="sendProfileForm()">Aceptar</button>
-                            <button type="submit" class="btn btn-primary btn-sm" id="cancelar" name="cancelar" tabindex="34" ng-click="abrirVentanaModal()">Cancelar</button>
+                            <!--<button type="submit" class="btn btn-primary btn-sm" id="cancelar" name="cancelar" tabindex="34" ng-click="abrirVentanaModal()">Cancelar</button>-->
                         </div>
                     </div>
                 </div>
